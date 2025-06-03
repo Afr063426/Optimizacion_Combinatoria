@@ -10,12 +10,18 @@ source("./cod/simulacion.clasificacion.R")
 
 # Tabla clasificación binaria
 ```{r}
-tabla.binaria <- generacion.tabla.binaria(10, 2, 2, seeds = c(7, 10))
+tabla.binaria <- generacion.tabla.binaria(10, 2, 2, seeds = c(5, 100))
 tabla.binaria
 ```
 
 ```{r}
 #Se procede a hacer un grafico mostrando los resultados de estos clusters
 tabla.binaria$tabla.binaria %>%
-    ggplot(aes(x = ))
+    #filter(cluster == 1) %>%
+    mutate(cluster = as.character(cluster)) %>%
+    ggplot(aes(x = jitter(V1), y = jitter(V2), color = cluster)) + 
+    geom_point() + 
+    theme_minimal()
 ```
+
+En este caso se ha aplicado ruido para identificar donde se ubican los puntos generados, en este caso se puede observar que existe
