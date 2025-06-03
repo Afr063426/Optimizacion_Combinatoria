@@ -1,0 +1,21 @@
+
+
+# Carga de paquetes
+```{r}
+library(tidyverse)
+source("./cod/simulacion.clasificacion.R")
+
+```
+
+
+# Tabla clasificación binaria
+```{r}
+tabla.binaria <- generacion.tabla.binaria(10, 2, 2, seeds = c(7, 10))
+tabla.binaria
+```
+
+```{r}
+#Se procede a hacer un grafico mostrando los resultados de estos clusters
+tabla.binaria$tabla.binaria %>%
+    ggplot(aes(x = ))
+```
