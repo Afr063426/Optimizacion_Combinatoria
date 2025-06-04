@@ -1,4 +1,21 @@
 
+---
+title: "Laboratorio 3"
+author: "Joshua Cervantes-Moisés Monge"
+date: "`r Sys.Date()`"
+theme: Cerulean
+format:
+    html:
+        self-contained: true
+        embed-resources: true
+execute:
+    echo: true
+    warning: false
+    error: false
+    freeze: auto
+    python: python3
+---
+
 
 # Carga de paquetes
 ```{r}
@@ -9,6 +26,29 @@ source("./cod/simulacion.clasificacion.R")
 
 
 # Tabla clasificación binaria
+
+En este caso vamos a emplear los propuesto en A Method for Generating High-Dimensional Multivariate Binary Variates. Esto se realiza de la siguiente manera.
+
+
+Tenemos las siguientes variables binarias $Y_{1},...,Y_{j}$ tales que $E[Y_{J}] = p_{j}$ con $J=1,...,j$ y $\text{corr}(Y_{j}, Y_{k}) = \delta_{jk}$ para $J\geq 2$. Se encuentra que en este caso la correlación se debe limitar a 
+$$
+ \max\left\{-(p_{j}p_{k}/q_{j}q_{k})^{(1/2)}, -(q_{j}q_{k}/p_{j}p_{k})^{(1/2)}\right\} \leq \delta_{jk} \leq \min\left\{(p_{j}q_{k}/p_{k}q_{j})^{(1/2)}, (p_{k}q_{j}/p_{j}q_{k})^{1/2}\right\}
+$$
+
+Se oarte de una distribución normal bivariada tal que hay que solucionar 
+\[
+\phi(z(p_{j}), z(p_{k}), \rho_{jk}) = \delta_{jk}(p_{j}q_{j}p_{k}q_{k})^{1/2} + p_{j}p_{k}
+\]
+
+donde $\rho_{jk}$ es el factor de correlación entre las variables en la normal bivariada. Entonces obtenemos que la matriz de correlaciones para la normal multivarida es igual a $\Sigma = (\rho_{jk})$. Y $z(p)$ es el $p$-ésimo cuantil de normal estándar. 
+
+Para generar $Y_{1},...,Y_{J}$ entonces genera una normal multivarida $(Z_{1},...,Z_{J})$ con media igual a 0 y matriz de correlación $\Sigma$. Y se asigna $Y_{j}$ si $Z_{j}\leq z(p_{j})$.
+
+Los parámetros que podemos variar para generar los clusters aquí son la correlación entre las variables y las probabilidades de obtener 0 o 1. 
+
+
+Así cada cluster va ser diferenciado por su correlación entre las covariables y las probabilidades de obtener 0 o 1 en las mismas.
+
 ```{r}
 tabla.binaria <- generacion.tabla.binaria(10, 2, 2, seeds = c(5, 100))
 tabla.binaria
@@ -24,4 +64,31 @@ tabla.binaria$tabla.binaria %>%
     theme_minimal()
 ```
 
-En este caso se ha aplicado ruido para identificar donde se ubican los puntos generados, en este caso se puede observar que existe
+En este caso se ha aplicado ruido para identificar donde se ubican los puntos generados, en este caso se puede observar que existen casos donde hay una clara concentración de las 
+clases en uno de los lados del gráfico. 
+
+
+# Tabla clasificación bimodal 
+
+Para poder generar una tabla bimodal el ejercicio es sencillo podemos emplear una mixtura de dos normales. En este caso los parámetros que podemos variar son la media, la desviación estándar y los pesos que se le otorgan a cada normal.
+
+Entonces la idea para cada variable es generar dos normales y agregar pesos a estos valores. De tal manera que los clusters van a estar definidos por las medias y desviación estándar otorgada cada normal, además de los pesos asignados. Se programa una función la cual genera estos parámetros de manera aleatoria para cada variable con base en las semillas dadas inicialmente. 
+
+```{r}
+tabla.bimodal <- generacion.tabla.bimodal(10, 2, 2, seeds = c(5, 100))
+tabla.bimodal
+
+```
+
+
+```{r}
+#Se procede a hacer un grafico mostrando los resultados de estos clusters
+tabla.bimodal$tabla.bimodal %>%
+    #filter(cluster == 1) %>%
+    mutate(cluster = as.character(cluster)) %>%
+    ggplot(aes(x = Var1, y = Var2, color = cluster)) + 
+    geom_point() + 
+    theme_minimal()
+```
+
+Se pueden observar dos clusters claramente definidos.

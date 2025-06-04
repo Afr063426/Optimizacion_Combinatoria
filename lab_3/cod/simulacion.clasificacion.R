@@ -142,3 +142,54 @@ generacion.tabla.binaria <- function(n, p, k, seeds){
     generacion.tabla.binaria$tabla.binaria <- df.tabla.binaria
     return(generacion.tabla.binaria)
 }
+
+
+#' @description  Esta funcion genera una tabla para clasificacion con datos bimodales
+#' @param n: Numero de observaciones
+#' @param p: Numero de variables
+#' @param k: Numero de clusters
+#' @param seeds: Semilla para la generacion de los clusters
+#' @return retorna una tabla de clasificacion binaria
+
+generacion.tabla.bimodal <- function(n, p, k, seeds){
+    #Se procede a generar las probabilidades de pertenecer a 0 a 1 de manera aleatoria
+    probabilidades <- c()
+    generacion.tabla.bimodal <- list() #Se usa esta lista para guardar la informacion de cada cluster
+    for(K in 1:k){
+        #Se genera una tabla para guardar la informacion de cada cluster
+        df <- data.frame(matrix(ncol = p, nrow = n))
+        colnames(df) <- paste0("Var", 1:p, sep = "")
+        df$cluster <- K #Se annade la columna de cluster
+
+        for(i in 1:p){
+            set.seed(seeds[K]*i)
+            mu <- runif(2, -5, 5) # Media de la distribucion bimodal
+            sigma <- runif(2, 0.5, 2) # Desviacion estandar de la distribucion bimodal
+            
+            #Se generan los pesos de cada normal 
+            pesos <- runif(1, 0.1, 0.9)
+
+            #Se generan los individuo del cluster
+            norm.x1 <- rnorm(n, mean = mu[1], sd = sigma[1])
+            norm.x2 <- rnorm(n, mean = mu[2], sd = sigma[2])
+            individuos <- pesos* norm.x1 + (1 - pesos) * norm.x2
+
+            #Se guarda la informacion de cada cluster
+            df[, i] <- individuos
+        }
+        if(K == 1){
+            df.tabla.bimodal <- df
+        } else {
+            df.tabla.bimodal <- rbind(df.tabla.bimodal, df)
+        }
+        # Se guardan los datos de cada cluster en la lista
+        generacion.tabla.bimodal[[K]] <- list(
+            individuos = df,
+            probabilidades = probabilidades,
+            cluster = K
+        )
+    }
+    generacion.tabla.bimodal$tabla.bimodal <- df.tabla.bimodal
+    return(generacion.tabla.bimodal)
+}
+    
